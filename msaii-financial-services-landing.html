@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSAII LLC — AI Infrastructure for Financial Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070B16;
+    --bg-elev:#0D1426;
+    --bg-elev-2:#121C36;
+    --border:rgba(94,150,255,0.16);
+    --border-strong:rgba(94,150,255,0.42);
+    --blue:#2F6BFF;
+    --blue-bright:#4F8CFF;
+    --cyan:#00E5FF;
+    --text-primary:#F2F6FF;
+    --text-secondary:#93A1C2;
+    --text-muted:#5C6A8A;
+    --radius:14px;
+    --max:1180px;
+    --glow-blue:0 0 0 1px rgba(94,150,255,0.25), 0 0 28px rgba(47,107,255,0.30);
+    --glow-cyan:0 0 22px rgba(0,229,255,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  ul{margin:0;padding:0;list-style:none;}
+  img,svg{display:block;max-width:100%;}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 8px 2px rgba(0,229,255,0.7);
+  }
+
+  /* background grid texture - simple, static */
+  .grid-bg{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(94,150,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,150,255,0.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 0%, black 40%, transparent 90%);
+    pointer-events:none;
+  }
+
+  /* ===== NAV ===== */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(7,11,22,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:0.01em;}
+  .logo .mark{
+    width:30px;height:30px;border-radius:7px;
+    background:linear-gradient(135deg, var(--blue), var(--cyan));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#04101F;
+    box-shadow:var(--glow-blue);
+  }
+  .logo .sub{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:11px;color:var(--text-muted);letter-spacing:0.02em;margin-left:2px;}
+  .nav-cta{display:none;}
+  @media(min-width:640px){.nav-cta{display:inline-flex;}}
+
+  /* ===== BUTTONS ===== */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;
+    border-radius:9px;
+    font-weight:600;
+    font-size:15px;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--blue), #1640C9);
+    color:#fff;
+    box-shadow:var(--glow-blue);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(94,150,255,0.4), 0 0 40px rgba(47,107,255,0.45);}
+  .btn-primary.large{padding:17px 36px;font-size:16.5px;}
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--border-strong);
+    color:var(--text-primary);
+  }
+  .btn-ghost:hover{background:rgba(94,150,255,0.08);}
+
+  /* ===== HERO ===== */
+  .hero{position:relative;overflow:hidden;padding:88px 0 70px;}
+  .hero-inner{position:relative;z-index:2;max-width:760px;}
+  .hero h1{
+    font-size:clamp(34px, 5vw, 56px);
+    line-height:1.06;
+    margin:20px 0 22px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(135deg, var(--cyan), var(--blue-bright));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero-sub{
+    font-size:18px;
+    color:var(--text-secondary);
+    max-width:600px;
+    margin-bottom:34px;
+  }
+  .hero-cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:18px;}
+  .cta-note{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--text-muted);}
+
+  .hero-diagram-wrap{
+    position:relative;z-index:2;
+    margin-top:64px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(13,20,38,0.6), rgba(13,20,38,0.2));
+    padding:30px 26px 22px;
+  }
+  .diagram-label{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-muted);
+    text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;
+  }
+
+  /* Mobile-friendly stacked version of the system diagram (SVG text is unreadable
+     when scaled down that far, so we swap to a vertical HTML flow instead) */
+  .diagram-mobile{display:none;flex-direction:column;gap:0;}
+  .dm-node{
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    background:var(--bg-elev-2);
+    padding:14px 16px;
+  }
+  .dm-node.accent{border-color:rgba(0,229,255,0.45);background:#101B3A;}
+  .dm-node .dm-title{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--text-primary);}
+  .dm-node.accent .dm-title{color:var(--cyan);}
+  .dm-node .dm-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .dm-arrow{align-self:center;color:var(--cyan);font-size:16px;padding:6px 0;}
+
+  @media(max-width:680px){
+    .hero-diagram-wrap .desktop-svg{display:none;}
+    .diagram-mobile{display:flex;}
+  }
+  .glow-blob{
+    position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;
+  }
+  .blob-1{width:480px;height:480px;background:rgba(47,107,255,0.22);top:-200px;right:-160px;}
+  .blob-2{width:380px;height:380px;background:rgba(0,229,255,0.12);bottom:-180px;left:-120px;}
+
+  /* ===== SECTION GENERIC ===== */
+  section{position:relative;padding:84px 0;}
+  .section-head{max-width:680px;margin-bottom:48px;}
+  .section-head h2{font-size:clamp(26px,3.4vw,38px);margin-top:14px;line-height:1.15;}
+  .section-sub{color:var(--text-secondary);font-size:16.5px;margin-top:14px;}
+  .divider-top{border-top:1px solid var(--border);}
+
+  /* ===== STATS ===== */
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  @media(max-width:860px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.stat-grid{grid-template-columns:1fr;}}
+  .stat-card{
+    background:var(--bg-elev);
+    padding:30px 26px;
+    transition:background .2s ease;
+  }
+  .stat-card:hover{background:var(--bg-elev-2);}
+  .stat-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:30px;font-weight:600;
+    color:var(--cyan);
+    text-shadow:0 0 18px rgba(0,229,255,0.35);
+    margin-bottom:8px;
+    letter-spacing:-0.01em;
+  }
+  .stat-label{font-size:14.5px;color:var(--text-secondary);}
+  .proof-banner{
+    margin-top:30px;
+    display:flex;align-items:center;gap:14px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 22px;
+    background:rgba(47,107,255,0.06);
+  }
+  .proof-banner .num{font-family:'IBM Plex Mono',monospace;color:var(--blue-bright);font-weight:600;font-size:17px;flex-shrink:0;}
+  .proof-banner p{font-size:14.5px;color:var(--text-secondary);}
+  .source-note{margin-top:22px;font-size:12.5px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;line-height:1.7;}
+
+  /* ===== TIERS ===== */
+  .tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  @media(max-width:980px){.tier-grid{grid-template-columns:1fr;}}
+  .tier-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--bg-elev);
+    padding:30px 28px 28px;
+    display:flex;flex-direction:column;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .tier-card:hover{border-color:var(--border-strong);transform:translateY(-3px);}
+  .tier-card.featured{
+    border-color:var(--border-strong);
+    background:linear-gradient(180deg, rgba(47,107,255,0.10), var(--bg-elev) 40%);
+    box-shadow:0 0 0 1px rgba(94,150,255,0.2), 0 0 50px rgba(47,107,255,0.12);
+  }
+  .tier-badge{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--blue-bright);margin-bottom:14px;
+  }
+  .tier-card h3{font-size:21px;margin-bottom:6px;}
+  .tier-audience{font-size:13.5px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;}
+  .tier-list{display:flex;flex-direction:column;gap:11px;margin-bottom:22px;}
+  .tier-list li{
+    display:flex;gap:10px;align-items:flex-start;
+    font-size:14.5px;color:var(--text-secondary);
+  }
+  .tier-list li::before{
+    content:"";flex-shrink:0;margin-top:7px;
+    width:6px;height:6px;border-radius:1px;
+    background:var(--cyan);
+    box-shadow:0 0 6px rgba(0,229,255,0.6);
+    transform:rotate(45deg);
+  }
+  .tier-result{
+    margin-top:auto;
+    border-top:1px solid var(--border);
+    padding-top:18px;
+  }
+  .tier-result .r-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+  .tier-result .r-value{font-size:14px;color:var(--text-primary);line-height:1.5;}
+  .tier-build{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:14px;}
+
+  /* ===== SECURITY ===== */
+  .security-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media(max-width:900px){.security-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:600px){.security-grid{grid-template-columns:1fr;}}
+  .sec-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px 22px;
+    background:var(--bg-elev);
+  }
+  .sec-icon{
+    width:38px;height:38px;border-radius:9px;
+    background:rgba(0,229,255,0.08);
+    border:1px solid rgba(0,229,255,0.25);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:16px;
+  }
+  .sec-icon svg{width:18px;height:18px;}
+  .sec-card h4{font-size:15.5px;margin-bottom:8px;}
+  .sec-card p{font-size:13.8px;color:var(--text-secondary);line-height:1.6;}
+
+  .integration-strip{
+    margin-top:46px;
+    border-top:1px solid var(--border);
+    padding-top:34px;
+  }
+  .integration-strip .lbl{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-transform:uppercase;letter-spacing:0.1em;
+    color:var(--text-muted);margin-bottom:18px;
+  }
+  .integration-chips{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:8px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--text-secondary);
+    background:var(--bg-elev);
+  }
+
+  /* ===== FAQ ===== */
+  .faq-list{border-top:1px solid var(--border);}
+  .faq-item{border-bottom:1px solid var(--border);}
+  .faq-q{
+    width:100%;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:24px 4px;
+    text-align:left;
+    font-size:16.5px;
+    font-weight:500;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .faq-q .plus{
+    flex-shrink:0;margin-left:20px;
+    width:22px;height:22px;border-radius:50%;
+    border:1px solid var(--border-strong);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    transition:transform .25s ease;
+  }
+  .faq-q .plus::before,.faq-q .plus::after{
+    content:"";position:absolute;background:var(--cyan);
+  }
+  .faq-q .plus::before{width:9px;height:1.5px;}
+  .faq-q .plus::after{width:1.5px;height:9px;}
+  .faq-item.open .plus{transform:rotate(135deg);}
+  .faq-a{
+    max-height:0;overflow:hidden;
+    transition:max-height .3s ease;
+  }
+  .faq-a-inner{padding:0 4px 26px;font-size:14.8px;color:var(--text-secondary);max-width:760px;line-height:1.7;}
+
+  /* ===== FINAL CTA ===== */
+  .final-cta{
+    text-align:center;
+    border-top:1px solid var(--border);
+  }
+  .final-cta .wrap{max-width:680px;}
+  .final-cta h2{font-size:clamp(28px,4vw,42px);line-height:1.15;margin-bottom:18px;}
+  .final-cta p{color:var(--text-secondary);font-size:17px;margin-bottom:36px;}
+
+  /* ===== FOOTER ===== */
+  footer{border-top:1px solid var(--border);padding:36px 0;}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center;}
+  .foot-text{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);}
+
+  /* ===== MODAL ===== */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:200;
+    background:rgba(4,7,16,0.75);
+    backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+    opacity:0;pointer-events:none;
+    transition:opacity .22s ease;
+  }
+  .modal-overlay.active{opacity:1;pointer-events:auto;}
+  .modal{
+    width:100%;max-width:440px;
+    background:var(--bg-elev);
+    border:1px solid var(--border-strong);
+    border-radius:16px;
+    padding:34px 32px 30px;
+    position:relative;
+    box-shadow:0 0 0 1px rgba(94,150,255,0.15), 0 30px 80px rgba(0,0,0,0.6), 0 0 60px rgba(47,107,255,0.18);
+    transform:translateY(10px) scale(.98);
+    transition:transform .22s ease;
+  }
+  .modal-overlay.active .modal{transform:translateY(0) scale(1);}
+  .modal-close{
+    position:absolute;top:18px;right:18px;
+    width:30px;height:30px;border-radius:50%;
+    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-muted);font-size:16px;
+  }
+  .modal-close:hover{color:var(--text-primary);border-color:var(--border-strong);}
+  .modal h3{font-size:21px;margin-bottom:10px;}
+  .modal p{font-size:14.5px;color:var(--text-secondary);margin-bottom:24px;line-height:1.6;}
+  .modal .btn-primary{width:100%;}
+  .modal-meta{
+    margin-top:18px;display:flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-muted);
+  }
+  .modal-meta::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px rgba(0,229,255,0.7);}
+
+  /* ===== REVEAL ===== */
+  /* Visible by default — JS only adds the hidden "pre" state as a progressive
+     enhancement, so content never disappears if a script fails to run. */
+  .reveal{opacity:1;transform:none;transition:opacity .6s ease, transform .6s ease;}
+  .reveal.pre{opacity:0;transform:translateY(16px);}
+  .reveal.pre.in{opacity:1;transform:translateY(0);}
+
+  @media(prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+    .reveal.pre{opacity:1;transform:none;}
+  }
+
+  @media(max-width:640px){
+    .wrap{padding:0 20px;}
+    section{padding:60px 0;}
+    .hero{padding:56px 0 44px;}
+    .stat-card,.sec-card,.tier-card{padding:22px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <div class="wrap">
+    <div class="logo"><span class="mark">M</span>MSAII<span class="sub">/ FinServ AI</span></div>
+    <button class="btn btn-ghost nav-cta" data-cta>Book Strategy Session</button>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="grid-bg"></div>
+  <div class="glow-blob blob-1"></div>
+  <div class="glow-blob blob-2"></div>
+  <div class="wrap">
+    <div class="hero-inner">
+      <p class="eyebrow">AI Growth Infrastructure for Financial Services</p>
+      <h1>Stop Paying Senior Talent To <span class="accent">Chase Paperwork.</span></h1>
+      <p class="hero-sub">CPA firms, RIAs, and insurance agencies lose 23–31% of billable hours to document chasing, report prep, and renewal admin that should never touch a credentialed professional. We build the integrated AI system that recovers it — compliant by design, connected to what you already run, scoped to pay for itself in one quarter.</p>
+      <div class="hero-cta-row">
+        <button class="btn btn-primary large" data-cta>Book Your AI Strategy Session</button>
+        <span class="cta-note">30-MIN SCOPING CALL · NO PRICING PITCH</span>
+      </div>
+    </div>
+
+    <div class="hero-diagram-wrap reveal">
+      <p class="diagram-label">// How the system runs — not a chatbot, an operating layer</p>
+      <svg id="flowSvg" class="desktop-svg" viewBox="0 0 1170 200" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#2F6BFF"/>
+            <stop offset="100%" stop-color="#00E5FF"/>
+          </linearGradient>
+        </defs>
+        <!-- connecting paths -->
+        <path d="M195 60 H 330" stroke="url(#lineGrad)" stroke-width="2" fill="none" stroke-dasharray="6 6" class="flow-line"/>
+        <path d="M195 140 H 330" stroke="url(#lineGrad)" stroke-width="2" fill="none" stroke-dasharray="6 6" class="flow-line"/>
+        <path d="M520 100 H 655" stroke="url(#lineGrad)" stroke-width="2" fill="none" stroke-dasharray="6 6" class="flow-line"/>
+        <path d="M845 100 H 980" stroke="url(#lineGrad)" stroke-width="2" fill="none" stroke-dasharray="6 6" class="flow-line"/>
+
+        <!-- node 1a: documents -->
+        <g>
+          <rect x="35" y="36" width="160" height="48" rx="8" fill="#0D1426" stroke="#5E96FF44"/>
+          <text x="115" y="56" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11" font-weight="600">Client Documents</text>
+          <text x="115" y="72" text-anchor="middle" fill="#5C6A8A" font-family="IBM Plex Mono" font-size="9">QuickBooks · CRM · AMS</text>
+        </g>
+        <!-- node 1b: requests -->
+        <g>
+          <rect x="35" y="116" width="160" height="48" rx="8" fill="#0D1426" stroke="#5E96FF44"/>
+          <text x="115" y="136" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11" font-weight="600">Renewals &amp; Reports</text>
+          <text x="115" y="152" text-anchor="middle" fill="#5C6A8A" font-family="IBM Plex Mono" font-size="9">Due dates · triggers</text>
+        </g>
+
+        <!-- node 2: AI system -->
+        <g>
+          <rect x="330" y="60" width="190" height="80" rx="10" fill="#0D1426" stroke="#00E5FF66" stroke-width="1.4"/>
+          <text x="425" y="92" text-anchor="middle" fill="#00E5FF" font-family="IBM Plex Mono" font-size="11.5" font-weight="600">AI System Layer</text>
+          <text x="425" y="110" text-anchor="middle" fill="#93A1C2" font-family="IBM Plex Mono" font-size="9.5">Capture · Process · Flag</text>
+          <text x="425" y="124" text-anchor="middle" fill="#5C6A8A" font-family="IBM Plex Mono" font-size="8.5">Make.com · n8n · Claude/GPT</text>
+        </g>
+
+        <!-- node 3: human review -->
+        <g>
+          <rect x="655" y="60" width="190" height="80" rx="10" fill="#0D1426" stroke="#5E96FF44"/>
+          <text x="750" y="92" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11.5" font-weight="600">Licensed Reviewer</text>
+          <text x="750" y="110" text-anchor="middle" fill="#93A1C2" font-family="IBM Plex Mono" font-size="9.5">Approves only exceptions</text>
+          <text x="750" y="124" text-anchor="middle" fill="#5C6A8A" font-family="IBM Plex Mono" font-size="8.5">CPA · Adviser · Producer</text>
+        </g>
+
+        <!-- node 4: outcome -->
+        <g>
+          <rect x="980" y="50" width="170" height="100" rx="10" fill="#101B3A" stroke="#00E5FF66" stroke-width="1.4"/>
+          <text x="1065" y="80" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11" font-weight="600">Hours Recovered</text>
+          <text x="1065" y="100" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11" font-weight="600">Client Retained</text>
+          <text x="1065" y="120" text-anchor="middle" fill="#F2F6FF" font-family="IBM Plex Mono" font-size="11" font-weight="600">Audit Logged</text>
+        </g>
+      </svg>
+
+      <div class="diagram-mobile">
+        <div class="dm-node"><div class="dm-title">Client Documents + Renewals</div><div class="dm-sub">QuickBooks · CRM · AMS</div></div>
+        <div class="dm-arrow">↓</div>
+        <div class="dm-node accent"><div class="dm-title">AI System Layer</div><div class="dm-sub">Capture · Process · Flag — Make.com · n8n · Claude/GPT</div></div>
+        <div class="dm-arrow">↓</div>
+        <div class="dm-node"><div class="dm-title">Licensed Reviewer</div><div class="dm-sub">Approves only exceptions — CPA · Adviser · Producer</div></div>
+        <div class="dm-arrow">↓</div>
+        <div class="dm-node accent"><div class="dm-title">Hours Recovered · Client Retained · Audit Logged</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SOCIAL PROOF / QUANTIFIED RESULTS ===== -->
+<section class="proof divider-top">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Quantified Outcomes</p>
+      <h2>What Firms Like Yours Recover</h2>
+      <p class="section-sub">Figures drawn from AICPA, Schwab Advisor Services, IAA, Big I, and LIMRA industry research — applied through the same systems we deploy.</p>
+    </div>
+
+    <div class="stat-grid reveal">
+      <div class="stat-card">
+        <div class="stat-num">12 → 3 days</div>
+        <div class="stat-label">Client document-collection cycle, fully automated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">15–18 hrs</div>
+        <div class="stat-label">Billable hours recovered per staff member, per month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">6 hrs → 45 min</div>
+        <div class="stat-label">RIA client-report prep, per client per cycle</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">+8–14 pts</div>
+        <div class="stat-label">Renewal retention lift vs. manual-only outreach</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">+30–48%</div>
+        <div class="stat-label">Revenue per client when firms shift to advisory-first</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">63% of RIAs</div>
+        <div class="stat-label">Already using AI tools in some capacity, late 2025</div>
+      </div>
+    </div>
+
+    <div class="proof-banner reveal">
+      <span class="num">78%</span>
+      <p>of firms that automated in 2024 grew revenue per staff member — they didn't cut headcount. The system removes admin between your people and billable work; it doesn't remove your people.</p>
+    </div>
+
+    <p class="source-note">SOURCES — AICPA 2025 Technology Survey · CPA.com 2025 · Journal of Accountancy · Schwab Advisor Services 2025 · IAA Evolution Revolution Report · Kitces Research 2024 · Big I 2024 Agency Universe Study · Thomson Reuters Future of Professionals Report</p>
+  </div>
+</section>
+
+<!-- ===== OFFER STACK ===== -->
+<section class="offers divider-top">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">The System</p>
+      <h2>One Integrated Platform. Three Stages of Maturity.</h2>
+      <p class="section-sub">Not a tool. Not a chatbot. A connected operating layer that sits on top of what you already run — sized to your firm, and scoped to pay for itself inside one quarter.</p>
+    </div>
+
+    <div class="tier-grid reveal">
+      <div class="tier-card">
+        <div class="tier-badge">Tier 01</div>
+        <h3>Practice Efficiency Starter</h3>
+        <p class="tier-audience">Best for a solo CPA or bookkeeper, a small RIA, or a 2–5 person firm drowning in client-chasing and manual admin.</p>
+        <ul class="tier-list">
+          <li>Client document-collection automation with escalating reminders</li>
+          <li>AI prospect-intake agent and discovery-call booking, consent-compliant</li>
+          <li>Automated invoicing with 30 / 60 / 90-day AR follow-up ladder</li>
+          <li>New-client onboarding — document requests, e-signature routing, CRM entry</li>
+        </ul>
+        <div class="tier-result">
+          <div class="r-label">Result</div>
+          <div class="r-value">Document cycle 12 → 3 days. AR cycle improved 8–12 days. 6–8 admin hours/week recovered.</div>
+        </div>
+        <div class="tier-build">Delivery — project-based, 3-week build</div>
+      </div>
+
+      <div class="tier-card featured">
+        <div class="tier-badge">Tier 02</div>
+        <h3>Revenue &amp; Retention Engine</h3>
+        <p class="tier-audience">Best for a 5–20 person CPA firm, an RIA managing $50M–$200M AUM, or an insurance agency with 200+ policies in force.</p>
+        <ul class="tier-list">
+          <li>Everything in Tier 1, plus:</li>
+          <li>AI client-report generator with a mandatory compliance checkpoint</li>
+          <li>Reconciliation exception-flagging automation</li>
+          <li>Insurance renewal engine — 90 / 60 / 30-day sequences, proposal pre-fill</li>
+          <li>Referral and milestone outreach automation</li>
+        </ul>
+        <div class="tier-result">
+          <div class="r-label">Result</div>
+          <div class="r-value">12–18 billable hrs/staff/month recovered. Renewal retention +8–14 pts. 2–4 added referral engagements per year.</div>
+        </div>
+        <div class="tier-build">Delivery — hybrid, 5-week build + 3-month optimization retainer</div>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-badge">Tier 03</div>
+        <h3>Advisory Intelligence Platform</h3>
+        <p class="tier-audience">Best for an established CPA firm of 10–50 staff, an RIA managing $100M–$500M AUM, or a multi-line agency moving from compliance to advisory.</p>
+        <ul class="tier-list">
+          <li>Everything in Tier 1 &amp; 2, plus:</li>
+          <li>AI advisory-brief generator from GL / portfolio data before every meeting</li>
+          <li>Compliance-calendar and audit-readiness automation with comms archiving</li>
+          <li>Insurance book-optimization and cross-sell engine</li>
+          <li>Firm-intelligence dashboard — utilization, realization, profitability, AR aging</li>
+        </ul>
+        <div class="tier-result">
+          <div class="r-label">Result</div>
+          <div class="r-value">Revenue per client +30–48%. Partner admin time down 10+ hrs/week. ~40% more engagements with no added headcount.</div>
+        </div>
+        <div class="tier-build">Delivery — white-glove, 6-month implementation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECURITY & TRUST ===== -->
+<section class="security divider-top">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Compliance &amp; Trust</p>
+      <h2>Built For Regulated Industries, Not Around Them</h2>
+      <p class="section-sub">Every system runs on a human-in-the-loop principle. AI prepares; a licensed professional approves. These guardrails are engineered in from day one — they're a differentiator, not a disclaimer.</p>
+    </div>
+
+    <div class="security-grid reveal">
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z"/></svg></div>
+        <h4>Human-in-the-Loop</h4>
+        <p>AI drafts documents, reports, briefs, and outreach. A licensed CPA, adviser, or producer approves every coverage, suitability, tax, or filing decision. AI never binds, advises, or files on its own.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><path d="M4 4h16v12H8l-4 4V4z"/></svg></div>
+        <h4>SEC / IAA Alignment</h4>
+        <p>Off-channel communications are captured and archived. Client-facing AI content is routed through compliance review before it's ever sent.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><path d="M22 16.92V21a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 012.06 4.18 2 2 0 014.06 2h4.09a2 2 0 012 1.72c.12.91.33 1.8.63 2.65a2 2 0 01-.45 2.11L9.1 9.7a16 16 0 006 6l1.22-1.23a2 2 0 012.11-.45c.85.3 1.74.51 2.65.63A2 2 0 0122 16.92z"/></svg></div>
+        <h4>TCPA Consent</h4>
+        <p>Prior express written consent is captured before any automated text or call, with a clear opt-out — confirmed against your E&amp;O carrier before activation.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"/></svg></div>
+        <h4>NAIC Model Bulletin</h4>
+        <p>AI use by insurance agencies is documented with governance, testing, and oversight aligned to the 2023 NAIC Model Bulletin on AI.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></div>
+        <h4>GLBA Data Security</h4>
+        <p>PII is handled under strict access controls and vendor-management discipline — positioned as part of the value delivered, not a liability carried.</p>
+      </div>
+      <div class="sec-card">
+        <div class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.7"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <h4>Full Audit Trail</h4>
+        <p>Every automated action is logged for books-and-records and exam readiness — turning automation into a compliance asset rather than a new risk.</p>
+      </div>
+    </div>
+
+    <div class="integration-strip reveal">
+      <p class="lbl">No rip-and-replace — the system layers onto what you already run</p>
+      <div class="integration-chips">
+        <span class="chip">QuickBooks</span>
+        <span class="chip">Xero</span>
+        <span class="chip">Your CRM</span>
+        <span class="chip">Your AMS</span>
+        <span class="chip">Your Custodian Platform</span>
+        <span class="chip">Practice Management Software</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq divider-top">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Before You Book</p>
+      <h2>Questions Firms Ask Before Adopting AI</h2>
+    </div>
+
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q">Will this replace my staff?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">No. 78% of firms that automated in 2024 grew revenue per staff member rather than cutting headcount, according to the AICPA. The system removes the admin sitting between your team and billable or advisory work — it doesn't remove the team.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How long until we're live?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Tier 1 systems deploy in roughly 3 weeks. Tier 2 runs a 5-week build plus a 3-month optimization retainer. Tier 3 is a white-glove 6-month implementation. Discovery and integration mapping happen in weeks 1–2, with build, training, and user-acceptance testing in weeks 3–4.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Do we have to replace QuickBooks, our CRM, or our AMS?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">No. Every system is built to sit on top of your existing source of truth — QuickBooks or Xero, your CRM, your AMS, your custodian platform — using Make.com, n8n, and Zapier as the connective layer. Nothing gets ripped out.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How is this compliant with SEC, TCPA, and NAIC rules?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Human-in-the-loop by design: AI drafts, a licensed professional approves. Off-channel communications are archived for SEC/IAA exam readiness, outbound texts and calls require documented TCPA consent confirmed with your E&amp;O carrier, and AI governance follows the NAIC Model Bulletin. Every action is logged.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What if my staff isn't technical?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Most of your team won't interact with the system beyond what they already do — reviewing a flagged exception, approving a drafted report. Staff training and user-acceptance testing are built into every engagement, and Tier 2+ includes hands-on, Done-With-You onboarding.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How do you guarantee ROI?<span class="plus"></span></button>
+        <div class="faq-a"><div class="faq-a-inner">Every engagement is scoped against your firm's actual numbers — your document cycle, AR cycle, compliance hours, or policies-per-client ratio — during the discovery call, before any build begins. Each system is sized so the recovered time and revenue pay for the engagement inside one quarter.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final-cta divider-top">
+  <div class="wrap reveal">
+    <p class="eyebrow" style="justify-content:center;">Ready When You Are</p>
+    <h2 style="margin-top:18px;">Your Best People Didn't Train For This To Spend It Chasing Paperwork.</h2>
+    <p>One 30-minute call to map your document cycle, your compliance load, or your renewal book against the system that recovers it.</p>
+    <button class="btn btn-primary large" data-cta>Book Your AI Strategy Session</button>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap">
+    <div class="logo" style="font-size:15px;"><span class="mark" style="width:24px;height:24px;font-size:11px;">M</span>MSAII LLC</div>
+    <p class="foot-text">AI Growth Infrastructure for Financial Services · Accounting · Wealth · Insurance</p>
+  </div>
+</footer>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h3>Book Your AI Strategy Session</h3>
+    <p>A 30-minute scoping call to map your document cycle, compliance load, or renewal book against the system that recovers it. No pricing pitch — just the numbers.</p>
+    <a class="btn btn-primary" href="https://cal.com/keerthana-saravana-kumar-y6aess/discovery-call?overlayCalendar=true" target="_blank" rel="noopener">Open Scheduler</a>
+    <div class="modal-meta">Opens in a new tab · Powered by Cal.com</div>
+  </div>
+</div>
+
+<script>
+  // ---- Modal ----
+  var overlay = document.getElementById('modalOverlay');
+  var closeBtn = document.getElementById('modalClose');
+  document.querySelectorAll('[data-cta]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      overlay.classList.add('active');
+    });
+  });
+  function closeModal(){ overlay.classList.remove('active'); }
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+
+  // ---- FAQ accordion ----
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var q = item.querySelector('.faq-q');
+    var a = item.querySelector('.faq-a');
+    q.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(openItem){
+        if(openItem !== item){
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-a').style.maxHeight = null;
+        }
+      });
+      if(isOpen){
+        item.classList.remove('open');
+        a.style.maxHeight = null;
+      } else {
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // ---- Scroll reveal (progressive enhancement; content is visible by default) ----
+  try {
+    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!prefersReduced && 'IntersectionObserver' in window){
+      var revealEls = document.querySelectorAll('.reveal');
+      revealEls.forEach(function(el){ el.classList.add('pre'); });
+      var observer = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            entry.target.classList.add('in');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {threshold:0.1});
+      revealEls.forEach(function(el){ observer.observe(el); });
+    }
+  } catch(e) { /* fail silently — .reveal is visible by default */ }
+
+  // ---- Hero flow line animation (subtle, single orchestrated moment) ----
+  try {
+    if(!prefersReduced){
+      var style = document.createElement('style');
+      style.textContent = '.flow-line{animation:dashFlow 1.6s linear infinite;}@keyframes dashFlow{to{stroke-dashoffset:-24;}}';
+      document.head.appendChild(style);
+    }
+  } catch(e) { /* no-op */ }
+</script>
+
+</body>
+</html>
